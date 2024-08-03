@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO₂ Emissions Line Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas {
+            width: 1200px;
+            height: 600px;
+            margin: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Annual CO₂ Emissions (per capita) in Australia and New Zealand</h1>
+    <canvas id="emissionsChart"></canvas>
+    <script>
+        const ctx = document.getElementById('emissionsChart').getContext('2d');
+        const labels = [
+            1980, 1981, 1982, 1983, 1984, 1985, 1986, 1987, 1988, 1989,
+            1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+            2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+            2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
+            2020, 2021, 2022
+        ];
+        const australiaData = [
+            13.896752, 14.320772, 14.372, 13.498299, 13.961717,
+            14.2252865, 13.991763, 14.4286995, 14.567257, 15.291002,
+            16.316298, 16.185081, 16.293701, 16.38393, 16.49495,
+            16.944706, 17.128435, 17.399693, 17.962667, 18.294834,
+            18.404053, 18.58794, 18.61468, 18.754335, 19.215673,
+            19.14587, 19.174072, 19.186764, 19.0257, 18.811646,
+            18.416328, 18.081861, 17.887936, 17.27638, 16.747185,
+            16.850307, 16.955637, 16.82187, 16.627844, 16.398174,
+            15.453229, 14.914762, 14.985412
+        ];
+        const newZealandData = [
+            5.5538454, 5.239781, 5.7350364, 5.589762, 5.9491034,
+            6.6877437, 6.99216, 7.324029, 7.6746984, 7.6350007,
+            7.5065045, 7.520228, 7.973439, 7.7680426, 7.7052326,
+            7.6222105, 7.859588, 8.283772, 7.8367033, 8.207955,
+            8.364016, 8.83861, 8.747851, 9.015298, 8.78021,
+            9.055258, 8.930537, 8.624869, 8.8043, 8.045747,
+            8.009116, 7.820801, 8.150096, 7.9180117, 7.850344,
+            7.8012037, 7.3162727, 7.519022, 7.379144, 7.4367194,
+            6.764759, 6.6900215, 6.212154
+        ];
+
+        const emissionsChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Australia',
+                        data: new Array(labels.length).fill(null),
+                        borderColor: 'blue',
+                        backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                        fill: false,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'New Zealand',
+                        data: new Array(labels.length).fill(null),
+                        borderColor: 'green',
+                        backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                        fill: false,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                animation: {
+                    duration: 0 // Disable default animations
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Year'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Annual CO₂ emissions (per capita)'
+                        }
+                    }
+                }
+            }
+        });
+
+        let index = 0;
+        let progress = 0;
+        const duration = 2000; // Duration to move from one point to the next in milliseconds
+        const frameRate = 60; // Frames per second
+
+        function animateLine() {
+            if (index < labels.length - 1) {
+                progress += 1 / (duration / (1000 / frameRate)); // Increment progress
+                const nextValueAustralia = australiaData[index] + (australiaData[index + 1] - australiaData[index]) * progress; // Interpolate to the next value
+                const nextValueNewZealand = newZealandData[index] + (newZealandData[index + 1] - newZealandData[index]) * progress; // Interpolate to the next value
+
+                emissionsChart.data.datasets[0].data[index + 1] = nextValueAustralia;
+                emissionsChart.data.datasets[1].data[index + 1] = nextValueNewZealand;
+                emissionsChart.update();
+
+                if (progress >= 1) {
+                    progress = 0;
+                    index++;
+                }
+
+                requestAnimationFrame(animateLine); // Request the next frame
+            }
+        }
+
+        animateLine();
+    </script>
+</body>
+</html>
